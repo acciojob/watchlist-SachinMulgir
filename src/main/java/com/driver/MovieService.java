@@ -12,40 +12,48 @@ public class MovieService{
     MovieRepository repo;
 
     public boolean addMovie(Movie movie) throws AlreadyExistException {
-        Optional<Movie> opt = repo.getMovieByName(movie.getName());
+        Optional<Movie> opt = this.repo.getMovieByName(movie.getName());
         if(opt.isPresent()){
             throw new AlreadyExistException(movie.getName());
         }
         return repo.addMovie(movie);
     }
 
-
-    public boolean addDirector(Director director) {
-        Optional<Director> opt = repo.getDirectorByName(director.getName());
+    public boolean addDirector(Director director) throws AlreadyExistException {
+        Optional<Director> opt = this.repo.getDirectorByName(director.getName());
         if( opt.isPresent() ){
             throw new AlreadyExistException(director.getName());
         }
         return repo.addDirector(director);
     }
 
-
-    public ResponseEntity addMovieDirectorPair(String movieName, String directorName) {
-
+    public void addMovieDirectorPair(String movieName, String directorName) throws NoDataException {
+        Optional<Movie> opt1 = this.repo.getMovieByName(movieName);
+        Optional<Director> opt2 = repo.getDirectorByName(directorName);
+        if( opt1.isEmpty() || opt2.isEmpty() ){
+            throw new NoDataException();
+        }
+        repo.addDirectorMovie(movieName, directorName);
     }
 
-
-    public ResponseEntity getMovieByName(String name) {
-
+    public Optional<Movie> getMovieByName(String name) {
+        Optional<Movie> opt = this.repo.getMovieByName(name);
+        if( opt.isEmpty() ){
+            throw new NoDataException();
+        }
+        return opt;
     }
 
-
-    public ResponseEntity getDirectorByName(String name) {
-
+    public Optional<Director> getDirectorByName(String name) {
+        Optional<Director> opt = this.repo.getDirectorByName(name);
+        if( opt.isEmpty() ){
+            throw new NoDataException();
+        }
+        return opt;
     }
 
-
-    public ResponseEntity getMoviesByDirectorName(Director director) {
-
+    public List<String> getMoviesByDirectorName(String director) {
+        return this.repo.getMoviesByDirector(director);
     }
 
 
@@ -57,13 +65,18 @@ public class MovieService{
         return opt.stream().toList();
     }
 
+    public void deleteDirectorByName(String director) {
+        List<String> movies = repo.getMoviesByDirector(director);
+        for( String movie : movies ){
+            repo.removeMovie(movie);
+        }
 
-    public ResponseEntity deleteDirectorByName(String name) {
-        return repo.deleteDirectorByName(name);
     }
 
-
     public void deleteAllDirectors() {
-        repo.deleteAllDirectors();
+        List<String> directors = repo.getAllDirectors();
+        for( String director : directors ){
+            deleteDirectorByName(director);
+        }
     }
 }

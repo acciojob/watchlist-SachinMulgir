@@ -10,6 +10,7 @@ public class MovieRepository {
 
     Map<String, Movie> hmMovies = new HashMap<>();
     Map<String, Director> hmDirector = new HashMap<>();
+    Map<String, List<String>> hmDirectorMovie = new HashMap<>();
 
 
     public boolean addMovie(Movie movie) {
@@ -17,10 +18,13 @@ public class MovieRepository {
         return true;
     }
 
+
     public boolean addDirector(Director director) {
         hmDirector.put(director.getName(), director);
         return true;
     }
+
+
 
     public Optional<Director> getDirectorByName(String name){
         if( hmDirector.containsKey(name) ){
@@ -41,12 +45,36 @@ public class MovieRepository {
         return hmMovies.values().stream().toList();
     }
 
-    public ResponseEntity deleteDirectorByName(String name) {
+    public void addDirectorMovie(String movieName, String directorName) {
+        if( hmDirectorMovie.containsKey(directorName) ){
+            List<String> list = hmDirectorMovie.get(directorName);
+            list.add(movieName);
+            hmDirectorMovie.put(directorName,list);
+        }
+        else{
+            List<String> list = new ArrayList<>();
+            list.add(movieName);
+            hmDirectorMovie.put(directorName,list);
+        }
+    }
 
+    public List<String> getMoviesByDirector(String director) {
+        return hmDirectorMovie.get(director);
+    }
+
+    public void removeMovie(String movie){
+        hmMovies.remove(movie);
+    }
+
+    public void deleteDirectorByName(String director){
+        hmDirector.remove(director);
+        hmDirectorMovie.remove(director);
 
     }
 
-    public void deleteAllDirectors() {
-
+    public List<String> getAllDirectors() {
+        return hmDirector.keySet().stream().toList();
     }
+
+
 }
