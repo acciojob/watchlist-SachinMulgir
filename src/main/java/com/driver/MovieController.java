@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-
 public class MovieController {
     @Autowired
     MovieService movieService;
