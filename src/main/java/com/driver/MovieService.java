@@ -1,7 +1,6 @@
 package com.driver;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -33,15 +32,16 @@ public class MovieService{
         if( opt1.isEmpty() || opt2.isEmpty() ){
             throw new NoDataException();
         }
-        repo.addDirectorMovie(movieName, directorName);
+        boolean check = repo.addDirectorMoviePair(movieName, directorName);
+        if( !check )throw new AlreadyExistException("Pair");
     }
 
-    public Optional<Movie> getMovieByName(String name) {
+    public Movie getMovieByName(String name) throws NoDataException {
         Optional<Movie> opt = this.repo.getMovieByName(name);
         if( opt.isEmpty() ){
             throw new NoDataException();
         }
-        return opt;
+        return opt.get();
     }
 
     public Optional<Director> getDirectorByName(String name) {
@@ -57,8 +57,8 @@ public class MovieService{
     }
 
 
-    public List<Movie> findAllMovies() throws NoDataException{
-        List<Movie> opt = repo.findAllMovies();
+    public List<String> findAllMovies() throws NoDataException{
+        List<String> opt = repo.findAllMovies();
         if(opt.size() == 0){
             throw new NoDataException();
         }

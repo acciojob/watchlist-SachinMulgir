@@ -1,6 +1,5 @@
 package com.driver;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -13,25 +12,19 @@ public class MovieRepository {
     Map<String, List<String>> hmDirectorMovie = new HashMap<>();
 
 
+    //Crud : CREATE
+
     public boolean addMovie(Movie movie) {
         hmMovies.put( movie.getName(), movie);
         return true;
     }
-
-
     public boolean addDirector(Director director) {
         hmDirector.put(director.getName(), director);
         return true;
     }
 
 
-
-    public Optional<Director> getDirectorByName(String name){
-        if( hmDirector.containsKey(name) ){
-            return Optional.of(hmDirector.get(name));
-        }
-        return Optional.empty();
-    }
+    //cRud : READ
 
     public Optional<Movie> getMovieByName(String name) {
         if( hmMovies.containsKey(name) ){
@@ -39,28 +32,44 @@ public class MovieRepository {
         }
         return Optional.empty();
     }
-
-    public List<Movie> findAllMovies() {
+    public Optional<Director> getDirectorByName(String name){
+        if( hmDirector.containsKey(name) ){
+            return Optional.of(hmDirector.get(name));
+        }
+        return Optional.empty();
+    }
+    public List<String> findAllMovies() {
         if( hmMovies.size() == 0 )return new ArrayList<>();
-        return hmMovies.values().stream().toList();
+        return hmMovies.keySet().stream().toList();
     }
-
-    public void addDirectorMovie(String movieName, String directorName) {
-        if( hmDirectorMovie.containsKey(directorName) ){
-            List<String> list = hmDirectorMovie.get(directorName);
-            list.add(movieName);
-            hmDirectorMovie.put(directorName,list);
-        }
-        else{
-            List<String> list = new ArrayList<>();
-            list.add(movieName);
-            hmDirectorMovie.put(directorName,list);
-        }
-    }
-
     public List<String> getMoviesByDirector(String director) {
         return hmDirectorMovie.get(director);
     }
+
+    public List<String> getAllDirectors() {
+        return hmDirector.keySet().stream().toList();
+    }
+
+
+    //crUd : UPDATE:
+    public boolean addDirectorMoviePair(String movieName, String directorName) {
+        List<String> list = new ArrayList<>();
+        if( hmDirectorMovie.containsKey(directorName) ){
+            list = hmDirectorMovie.get(directorName);
+            if( list.contains(movieName) ){
+                return false;
+            }
+            list.add(movieName);
+        }
+        else{
+            list.add(movieName);
+        }
+        hmDirectorMovie.put(directorName,list);
+        return true;
+    }
+
+
+    // cruD : DELETE
 
     public void removeMovie(String movie){
         hmMovies.remove(movie);
@@ -70,10 +79,6 @@ public class MovieRepository {
         hmDirector.remove(director);
         hmDirectorMovie.remove(director);
 
-    }
-
-    public List<String> getAllDirectors() {
-        return hmDirector.keySet().stream().toList();
     }
 
 

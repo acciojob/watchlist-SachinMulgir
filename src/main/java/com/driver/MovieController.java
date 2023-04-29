@@ -14,8 +14,7 @@ public class MovieController {
     @Autowired
     MovieService movieService;
 
-
-    //POST methods:
+    //************************************ P O S T ******************************************//
     @PostMapping("/add-movie")
     public ResponseEntity addMovie(@RequestBody Movie movie ){
         try{
@@ -38,7 +37,7 @@ public class MovieController {
     }
 
 
-    //PUT methods:
+    //************************************ P U T ******************************************//
     @PutMapping("/add-movie-director-pair")
     public ResponseEntity addMovieDirectorPair(@RequestParam String movieName, @RequestParam String directorName){
         try{
@@ -46,15 +45,17 @@ public class MovieController {
             return new ResponseEntity("Added the pair successfully", HttpStatus.valueOf(200));
         }catch (NoDataException ex){
             return new ResponseEntity("Either of the movie or director is missing", HttpStatus.NOT_FOUND);
+        }catch (AlreadyExistException ex){
+            return new ResponseEntity("Pair Already Exist", HttpStatus.BAD_REQUEST);
         }
     }
 
 
-    //GET methods:
+    //*****************************      G E T   ****************************************//
     @GetMapping("/get-movie-by-name/{name}")
     public ResponseEntity getMovieByName(@PathVariable String name){
         try{
-            Optional<Movie> movie = this.movieService.getMovieByName(name);
+            Movie movie = this.movieService.getMovieByName(name);
             return new ResponseEntity(movie, HttpStatus.valueOf(200));
         }catch (NoDataException ex){
             return new ResponseEntity("Movie with name = " + name + " does not exist", HttpStatus.valueOf(404));
@@ -86,13 +87,14 @@ public class MovieController {
     @GetMapping("/get-all-movies")
     public ResponseEntity findAllMovies(){
         try{
-            List<Movie> list = this.movieService.findAllMovies();
+            List<String> list = this.movieService.findAllMovies();
             return new ResponseEntity(list, HttpStatus.valueOf(200));
         }catch (NoDataException ex){
             return new ResponseEntity("No data found", HttpStatus.valueOf(404));
         }
     }
 
+    //************************************ D E L E T E ******************************************//
     //DELETE methods:
     @DeleteMapping("/delete-director-by-name")
     public ResponseEntity deleteDirectorByName(@RequestParam String director){
